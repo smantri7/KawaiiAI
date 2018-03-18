@@ -39,7 +39,8 @@ def findMovieFeatures(html_block):
         enGen = html_block.find("<", currIndex)
         currIndex = enGen
         if (firsGen != enGen):
-            genreList.append(html_block[firsGen+7:enGen])
+            if ((enGen)-(firsGen+7) < 20):
+                genreList.append(html_block[firsGen+7:enGen])
         #print("~~~~~")
 
     #current = genreStart
@@ -55,7 +56,8 @@ def findMovieFeatures(html_block):
     dual.append(movie)
     dual.append(float(html_block[imdbRatingStart+14:imdbRatingEnd]))
     dual.append(genreList)
-    dual.append(html_block[synopsisStart+4: synopsisEnd].strip())
+    dual.append(remove_leftover_code(html_block[synopsisStart+4: synopsisEnd].strip()))
+    #dual.append(html_block[synopsisStart+4: synopsisEnd].strip())
     #print(dual)
     #print("~~~~~~")
     return dual
@@ -91,33 +93,78 @@ def get_webscrape_top_movies():
     movieDict = {}
     page_links = []
     features = []    #(Name, Score, Genre, Summary)
-    preNum = "http://www.imdb.com/search/title?groups=top_250&sort=user_rating,desc&view=advanced&page="
+    preNum = "http://www.imdb.com/search/title?groups=top_1000&sort=user_rating&view=simple&page="
     postNum =   "&ref_=adv_prv"
-    html_page = preprocessing("http://www.imdb.com/chart/top")
-    return get_movie_features(html_page)
+    #html_page = preprocessing("http://www.imdb.com/chart/top")
+    for page in range(0,1):
+        largeString = preNum + str(page+1) + postNum
+        html_page = preprocessing(largeString)
+        movList = get_movie_features(html_page)
+    return movieDict
+    
 
+#removes unnecessary html tags for actors/actresses
+
+def remove_leftover_code(codeblock):
+    iteration = 1
+    codeblock.replace("\'", "'")
+    #codeblock.replace('"', '8')
+    while(True):
+        #print("--------------------------")
+        #print("iteration: ", iteration)
+        #print(codeblock)
+        indexStart = codeblock.find("<a href")
+        indexEnd = codeblock.find(">", indexStart)
+        if (indexStart == -1 or indexEnd == -1):
+            
+            return codeblock
+        editedblock = codeblock[0:indexStart] + codeblock[indexEnd+1:len(codeblock)]
+        secondStart = editedblock.find("<")
+        secondEnd = editedblock.find(">")
+        finalEdit = editedblock[0:secondStart] + editedblock[secondEnd+1:len(editedblock)]
+        codeblock = finalEdit
+        iteration += 1
+    
+#print(testString)                                                                                                                       
+#editedString = remove_leftover_code(testString)
+#print(editedString)
 
 def get_movie_features(codeblock):
-
+    count = 1
     # 1. get movie name
     movList = []
     movie_to_summary = {}
     movie_links = re.findall(r'(/tt{1}[0-9]{7})+', codeblock)
+    
     movie_list = []
     for m in movie_links:
         movie = "http://www.imdb.com/title" + m + "/"
         movie_list.append(movie)
     movSet = set(movie_list)
-    count = 1
+    print(movSet)
+    return 0
+    
     #print(len(movSet))
     for item in movSet:
-        print(count)
+        #print(count)
+        if (count > 50):
+            return movList
         preprocessed_movie_link = preprocessing(item)
         dual = findMovieFeatures(preprocessed_movie_link)
-        movie_to_summary[count] = dual
+        #print(dual)
+        movList.append(dual)
         count += 1
-    return movie_to_summary
+        #print(count)
+    return movList
+        
+
+
 
 #testMovFeats = findMovieFeatures(preprocessing("http://www.imdb.com/title/tt0099429/"))
 #print(testMovFeats)
-get_webscrape_top_movies()
+
+topDictMovies = get_webscrape_top_movies()
+#print(len(topDictMovies))
+def get_movie_by_genre(movie_data):
+    pass
+
