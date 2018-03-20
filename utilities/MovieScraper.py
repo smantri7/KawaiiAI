@@ -25,7 +25,11 @@ def findMovieFeatures(html_block):
     plotSumTag = html_block.find("Storyline")
     descriptionStart = html_block.find('div class="inline canwrap"', plotSumTag)
     synopsisStart = html_block.find("<p>", descriptionStart)
-    synopsisEnd = html_block.find("<em", synopsisStart)
+    findP = html_block.find("</p", synopsisStart)
+    findEm = html_block.find("<em", synopsisStart)
+    synopsisEnd = findEm
+    if (findEm == -1):
+        synopsisEnd = findP
     imdbRatingStart = html_block.find("strong title=")
     imdbRatingEnd = html_block.find(" b", imdbRatingStart)
     genreStart = html_block.find('Genres:')
@@ -58,10 +62,8 @@ def findMovieFeatures(html_block):
     dual.append(genreList)
     dual.append(remove_leftover_code(html_block[synopsisStart+4: synopsisEnd].strip()))
     #dual.append(html_block[synopsisStart+4: synopsisEnd].strip())
-    #print(dual)
     #print("~~~~~~")
     return dual
-
 
 
 def ret_movie_set():
@@ -141,8 +143,7 @@ def get_movie_features(codeblock):
         movie = "http://www.imdb.com/title" + m + "/"
         movie_list.append(movie)
     movSet = set(movie_list)
-    print(movSet)
-    return 0
+    #print(movSet)
     
     #print(len(movSet))
     for item in movSet:
@@ -150,8 +151,10 @@ def get_movie_features(codeblock):
         if (count > 50):
             return movList
         preprocessed_movie_link = preprocessing(item)
+        #print(item)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         dual = findMovieFeatures(preprocessed_movie_link)
-        #print(dual)
+        print(dual)
         movList.append(dual)
         count += 1
         #print(count)
