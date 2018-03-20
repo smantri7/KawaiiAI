@@ -1,5 +1,6 @@
 import urllib.request
 import re
+import csv
 
 #Created by Ishan Waykul
 
@@ -30,6 +31,8 @@ def findMovieFeatures(html_block):
     synopsisEnd = findEm
     if (findEm == -1):
         synopsisEnd = findP
+    if (synopsisEnd == -1):
+        print("error with: ", movie)
     imdbRatingStart = html_block.find("strong title=")
     imdbRatingEnd = html_block.find(" b", imdbRatingStart)
     genreStart = html_block.find('Genres:')
@@ -98,10 +101,15 @@ def get_webscrape_top_movies():
     preNum = "http://www.imdb.com/search/title?groups=top_1000&sort=user_rating&view=simple&page="
     postNum =   "&ref_=adv_prv"
     #html_page = preprocessing("http://www.imdb.com/chart/top")
+    imdb_write_to_file = open('Top_1000_IMDB_Movies.csv', 'w')
+    imdb_write_to = csv.writer(imdb_write_to_file, delimiter = ",")
+    imdb_write_to.writerow(["Name", "Score", "Genres", "Summary"])
     for page in range(0,1):
+        print("Currently Scraping: ", (page+1))
         largeString = preNum + str(page+1) + postNum
         html_page = preprocessing(largeString)
-        movList = get_movie_features(html_page)
+        movList = get_movie_features(html_page, imdb_write_to)
+    #imdb_write_to.close()
     return movieDict
     
 
@@ -131,7 +139,7 @@ def remove_leftover_code(codeblock):
 #editedString = remove_leftover_code(testString)
 #print(editedString)
 
-def get_movie_features(codeblock):
+def get_movie_features(codeblock, writeFile):
     count = 1
     # 1. get movie name
     movList = []
@@ -152,16 +160,18 @@ def get_movie_features(codeblock):
             return movList
         preprocessed_movie_link = preprocessing(item)
         #print(item)
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         dual = findMovieFeatures(preprocessed_movie_link)
-        print(dual)
+        #print(dual)
         movList.append(dual)
+        #writeFile.writerow(dual)
         count += 1
         #print(count)
     return movList
         
 
-
+    
+    
 
 #testMovFeats = findMovieFeatures(preprocessing("http://www.imdb.com/title/tt0099429/"))
 #print(testMovFeats)
