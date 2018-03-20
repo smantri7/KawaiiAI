@@ -164,7 +164,7 @@ def get_movie_features(codeblock, writeFile):
         dual = findMovieFeatures(preprocessed_movie_link)
         #print(dual)
         movList.append(dual)
-        #writeFile.writerow(dual)
+        #writeFile.writerow(dual)             #GIVING ME A PROBLEM WITH ASCII
         count += 1
         #print(count)
     return movList
