@@ -101,14 +101,15 @@ def get_webscrape_top_movies():
     preNum = "http://www.imdb.com/search/title?groups=top_1000&sort=user_rating&view=simple&page="
     postNum =   "&ref_=adv_prv"
     #html_page = preprocessing("http://www.imdb.com/chart/top")
-    imdb_write_to_file = open('Top_1000_IMDB_Movies.csv', 'w')
+    imdb_write_to_file = open('imdb.csv', 'w', encoding="utf-8")
     imdb_write_to = csv.writer(imdb_write_to_file, delimiter = ",")
     imdb_write_to.writerow(["Name", "Score", "Genres", "Summary"])
-    for page in range(0,1):
+    for page in range(0,100):
         print("Currently Scraping: ", (page+1))
         largeString = preNum + str(page+1) + postNum
         html_page = preprocessing(largeString)
         movList = get_movie_features(html_page, imdb_write_to)
+        imdb_write_to.writerow(movList[0])
     #imdb_write_to.close()
     return movieDict
     
