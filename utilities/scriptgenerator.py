@@ -173,7 +173,7 @@ def load_generator(filename):
     return pickle.load(open(filename, 'rb'))
 
 #s = ScriptGenerator()
-s = load_generator("gen.pkl")
+s = load_generator("models/gen.pkl")
 print("loaded generator...")
 model = s.regenerate_model("models/final_120.hdf5")
 print("loaded model...")
